@@ -1,0 +1,35 @@
+trigger:
+  branches:
+    include:
+    - main
+  paths:
+    include:
+    - projects/monitoring-AC-CDNC-SharedServices-PR-001.bicep
+    - modules/scheduled_query_rules.bicep
+
+name: Deploy Log Query Alert Rules in subscription_1 Subscription
+
+variables:
+  vmImageName: 'ubuntu-latest'
+  azureServiceConnection: 'Customer-Service-Connection'
+  subscriptionId: '12345'
+  location: 'West Europe'
+  system.debug: true
+
+pool:
+  vmImage: $(vmImageName)
+
+steps:
+- task: AzureResourceManagerTemplateDeployment@3
+  displayName: Create/Update Log Query Alert Rules
+  inputs:
+    deploymentScope: 'Resource Group'
+    azureResourceManagerConnection: '$(azureServiceConnection)'
+    subscriptionId: '$(subscriptionId)'
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: 'rg-CDNC-ActiveDirectory-PR-001'
+    location: '$(location)'
+    templateLocation: 'Linked artifact'
+    csmFile: '$(System.DefaultWorkingDirectory)/projects/monitoring-AC-CDNC-SharedServices-PR-001.bicep'
+    deploymentMode: 'Incremental'
+    deploymentName: 'DeployBicepFile'
